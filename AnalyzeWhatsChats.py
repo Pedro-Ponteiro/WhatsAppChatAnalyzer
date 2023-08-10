@@ -8,12 +8,15 @@ import pandas as pd
 from rake_nltk import Rake
 
 
-def read_all_chat_files(folder_path) -> List[str]:
+def read_all_chat_files(folder_path, save: bool = False) -> List[str]:
     all_lines = ""
     for filename in os.listdir(folder_path):
         with open(os.path.join(folder_path, filename), "r", encoding="utf-8") as f:
             all_lines += f.read().split("\n", maxsplit=1)[1]
 
+    if save:
+        with open("all_chat_data.txt", "w", encoding="utf-8") as f:
+            f.write(all_lines)
     return all_lines
 
 
@@ -120,11 +123,13 @@ def get_word_count_data(df: pd.DataFrame, n: int = 100) -> List[Tuple[str, str, 
 
 
 def main() -> None:
-    chat_lines = read_all_chat_files("./chats")
+    chat_lines = read_all_chat_files("./chats", save=True)
     chat_lines_formated = get_messages_list(chat_lines)
     df = transform_to_df(chat_lines_formated)
 
-    word_count_data = get_word_count_data(df)
+    df.to_excel("all_messages.xlsx", index=None)
+
+    word_count_data = get_word_count_data(df, None)
 
     df_word_count = pd.DataFrame(
         word_count_data,
@@ -132,7 +137,7 @@ def main() -> None:
         dtype=str,
     )
 
-    frases_chave = get_rake_classification(df["message"], 500)
+    frases_chave = get_rake_classification(df["message"], None)
     frases_chave = [frase + "\n\n" for frase in frases_chave]
 
     df_word_count.to_excel("word_count_data.xlsx", index=None)
