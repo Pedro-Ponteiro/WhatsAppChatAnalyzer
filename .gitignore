@@ -2,3 +2,5 @@ venv
 chats
 rake_phrases.txt
 word_count_data.xlsx
+all_chat_data.txt
+all_messages.xlsx
